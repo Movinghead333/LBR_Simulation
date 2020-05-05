@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plan>
+	<action fx="-0.2" fy="0.0" fz="-0.2"  tx="0.2" ty="0.0" tz="-0.2" name="red block"  object_height="0.1"></action>
+  <action fx="-0.1" fy="0.0" fz="-0.2"  tx="0.2" ty="0.1" tz="-0.2" name="blue cube"  object_height="0.04"></action>
+	<action fx="-0.2" fy="0.0" fz="-0.35" tx="0.2" ty="0.0" tz="-0.35" name="red block" object_height="0.1"></action>
+  <action fx="-0.1" fy="0.0" fz="-0.35" tx="0.2" ty="0.1" tz="-0.35" name="blue cube" object_height="0.04"></action>
+	<action fx="-0.2" fy="0.0" fz="-0.5"  tx="0.2" ty="0.0" tz="-0.5" name="red block"  object_height="0.1"></action>
+  <action fx="-0.1" fy="0.0" fz="-0.5"  tx="0.2" ty="0.1" tz="-0.5" name="blue cube"  object_height="0.04"></action>
+  <action fx="-0.2" fy="0.0" fz="-0.65" tx="0.2" ty="0.0" tz="-0.65" name="red block" object_height="0.1"></action>
+  <action fx="-0.1" fy="0.0" fz="-0.65" tx="0.2" ty="0.1" tz="-0.65" name="blue cube" object_height="0.04"></action>
+</plan>
