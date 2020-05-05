@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/LBR Sim Scene.unity
     guid: 20bec17ee7dc2084fbee704ab63ca1ea
   m_configObjects: {}

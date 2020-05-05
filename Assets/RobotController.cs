@@ -108,7 +108,7 @@ public class RobotController : MonoBehaviour
             // calculate rotation of current joint
             Matrix4x4 rotation = i % 2 == 0 ?
                 Matrix4x4.Rotate(Quaternion.Euler(0f, jointAngles[i], 0f)) :
-                Matrix4x4.Rotate(Quaternion.Euler(jointAngles[i], 0f, 0f));
+                Matrix4x4.Rotate(Quaternion.Euler(0f, 0f, jointAngles[i]));
 
             // update joint transform
             joints[i] = parentTransform * translation * rotation;
@@ -228,7 +228,7 @@ public class RobotController : MonoBehaviour
         // joint 0
         Vector2 xzDirection = (new Vector2(shoulderWristDir.x, shoulderWristDir.z)).normalized;
 
-        Vector2 rotatedDirection = new Vector2(-xzDirection.y, -xzDirection.x);
+        Vector2 rotatedDirection = new Vector2(xzDirection.x, -xzDirection.y);
 
         float j0Angle = Mathf.Atan2(rotatedDirection.y, rotatedDirection.x) * Mathf.Rad2Deg;
 
