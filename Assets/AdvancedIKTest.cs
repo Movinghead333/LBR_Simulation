@@ -16,13 +16,26 @@ public class AdvancedIKTest : MonoBehaviour
     [Range(-1f, 1f)]
     public float zValue = 0f;
 
+    // rotation angles
+    [Range(-180f, 180f)]
+    public float yawAngle = 0f;
+
+    [Range(-180f, 180f)]
+    public float pitchAngle = 0f;
+
+    [Range(-180f, 180f)]
+    public float rollAngle = 0f;
+
     Vector3 targetPosition;
-    Vector3 facingVector;
+    Vector3 approachVector = new Vector3(0, 1, 0);
+    Vector3 slideVector    = new Vector3(0, 0, 1);
+    Vector3 normalVector   = new Vector3(1, 0, 0);
 
     [Range(-170f, 170f)]
     public float facingAxisAngle = 0f;
 
     public GameObject targetObject;
+    public GameObject targetObject2;
 
     public RobotController robotController;
 
@@ -46,7 +59,20 @@ public class AdvancedIKTest : MonoBehaviour
         }
 
         targetPosition = targetObject.transform.position;
-        facingVector = new Vector3(xValue, yValue, zValue);
+
+        approachVector = new Vector3(xValue, yValue, zValue);
+
+        Quaternion newRotation =
+            Quaternion.Euler(0, yawAngle, 0) *
+            Quaternion.Euler(0, 0, pitchAngle) * 
+            Quaternion.Euler(0, rollAngle, 0);
+        RotationTest.Instance.SetPose(targetPosition, newRotation);
+
+        approachVector = newRotation * new Vector3(0, 1, 0);
+        slideVector    = newRotation * new Vector3(0, 0, 1);
+        normalVector   = newRotation * new Vector3(1, 0, 0);
+        //targetObject2.transform.position = targetObject.transform.position;
+        //targetObject2.transform.rotation = Quaternion.AngleAxis(facingAxisAngle, facingVector);
 
         //if (Input.GetKeyDown(KeyCode.T))
         {
@@ -55,8 +81,11 @@ public class AdvancedIKTest : MonoBehaviour
                 float[] ikConfig = robotController.CalculateAdvancedIK(
                     robotController.gameObject.transform.position,
                     targetPosition,
-                    facingVector,
-                    facingAxisAngle);
+                    approachVector,
+                    slideVector,
+                    normalVector);
+
+
 
                 robotController.jointAngles = ikConfig;
             }

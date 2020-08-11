@@ -4,6 +4,18 @@ using UnityEngine;
 
 public class RobotController : MonoBehaviour
 {
+    // DH parameters and kinematic chain:
+    // B: Base, T: Torsion, Rotation: R, TCP: Tool Center Point
+    // Kinematic Chain: B-T-R-T-R-T-R-T-TCP
+    // DH-Parameters:
+    //  joint d    theta    a    alpha
+    //  0     0,31 0        0     90
+    //  1     0    0        0    -90
+    //  2     0,4  0        0    -90
+    //  3     0    0        0     90
+    //  4     0,39 0        0     90
+    //  5     0    0        0    -90
+    //  6     0    0        0     0
 
     private static float aSide = 0.39f;
     private static float bSide = 0.4f;
@@ -57,8 +69,8 @@ public class RobotController : MonoBehaviour
         joints = new Matrix4x4[7];
         jointOffsets = new Vector3[7];
         jointAngles = new float[7];
-        jointAngles[3] = -90f;
-        jointAngles[5] = -90f;
+        jointAngles[3] = 90f;
+        jointAngles[5] = 90f;
 
         jointOffsets[0] = new Vector3(0f, 0.12f, 0f);
         jointOffsets[1] = new Vector3(0f, 0.19f, 0f);
@@ -164,7 +176,7 @@ public class RobotController : MonoBehaviour
         // joint 0
         Vector2 xzDirection = (new Vector2(objDirection.x, objDirection.z)).normalized;
 
-        Vector2 rotatedDirection = new Vector2(-xzDirection.y, -xzDirection.x);
+        Vector2 rotatedDirection = new Vector2(-xzDirection.x, xzDirection.y);
 
         float j0Angle = Mathf.Atan2(rotatedDirection.y, rotatedDirection.x) * Mathf.Rad2Deg;
 
@@ -178,7 +190,7 @@ public class RobotController : MonoBehaviour
         float objDirUPDirAngle = Vector3.Angle(Vector3.up, objDirection);
 
         float j1Angle = objDirUPDirAngle - alphaAngle;
-        config[1] = -j1Angle;
+        config[1] = j1Angle;
 
 
         // joint 3
@@ -186,7 +198,7 @@ public class RobotController : MonoBehaviour
         float gammaAngle = Mathf.Acos(acosArg2) * Mathf.Rad2Deg;
 
         float j3Angle = 180f - gammaAngle;
-        config[3] = -j3Angle;
+        config[3] = j3Angle;
 
 
         // joint 5
@@ -196,7 +208,7 @@ public class RobotController : MonoBehaviour
         float objDirUpDirCounterAngle = 180f - objDirUPDirAngle;
 
         float j5Angle = objDirUpDirCounterAngle - betaAngle;
-        config[5] = -j5Angle;
+        config[5] = j5Angle;
 
         return config;
     }
@@ -204,8 +216,9 @@ public class RobotController : MonoBehaviour
     public float[] CalculateAdvancedIK(
         Vector3 robotBasePosition,
         Vector3 targetPosition,
-        Vector3 facingDirection,
-        float facingAngle)
+        Vector3 approachVector,
+        Vector3 slideVector,
+        Vector3 normalVector)
     {
         float[] config = new float[7];
 
@@ -214,7 +227,7 @@ public class RobotController : MonoBehaviour
 
         // calculate position of spherical wrist joint
         float testDist = wristFlunchDist + 0.05f;
-        Vector3 wristPos = targetPosition - (facingDirection.normalized * testDist);
+        Vector3 wristPos = targetPosition - (approachVector.normalized * testDist);
 
         // calculate vector and distance between shoulder and wrist joint centers
         Vector3 shoulderWristDir = (wristPos - shoulderPos);
@@ -258,8 +271,8 @@ public class RobotController : MonoBehaviour
         config[3] = -j3Angle;
 
         // joint 4
-        Vector3 theta0RotationAxis = Vector3.Cross(Vector3.up, shoulderWristDir);
-        Matrix4x4 rotMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(j1Angle, theta0RotationAxis));
+        Vector3 theta1RotationAxis = Vector3.Cross(Vector3.up, shoulderWristDir);
+        Matrix4x4 rotMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(j1Angle, theta1RotationAxis));
         Vector3 segment1Vec = rotMatrix.MultiplyVector(Vector3.up);
         Vector3 elbowPos = shoulderPos + segment1Vec.normalized * aSide;
 
@@ -284,7 +297,16 @@ public class RobotController : MonoBehaviour
         config[5] = -j5Angle;
 
         // joint 6
-        config[6] = facingAngle;
+        Vector3 j5RotationAxis = Vector3.Cross(wristTCPVec, j4RotationAxis);
+        Vector3 currentNormalVec = Vector3.Cross(wristTCPVec, j5RotationAxis);
+        Vector3 directionCheck = wristPos + currentNormalVec.normalized * 0.2f;
+        float normalDirSign = Mathf.Sign(Vector3.Dot(j5RotationAxis, normalVector));
+        float j6Angle = Vector3.Angle(normalVector, currentNormalVec) * normalDirSign;
+        PositionProbe.Instance.SetPositionProbe(directionCheck);
+
+        Debug.Log("Direction: " + normalDirSign);
+        
+        config[6] = -j6Angle;
 
         return config;
     }

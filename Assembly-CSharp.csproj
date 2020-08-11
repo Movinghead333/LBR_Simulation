@@ -77,8 +77,10 @@
     <Compile Include="Assets\RobotIdle.cs" />
     <Compile Include="Assets\RobotPath.cs" />
     <Compile Include="Assets\RobotTouchController.cs" />
+    <Compile Include="Assets\RotationTest.cs" />
     <Compile Include="Assets\TargetMovement.cs" />
     <Compile Include="Assets\TextController.cs" />
+    <Compile Include="Assets\TransformationMimic.cs" />
     <Compile Include="Assets\XMLParser.cs" />
     <None Include="Assets\Resources\Plans\plan.xml" />
     <Reference Include="Unity.XR.FaceSubsystem">
