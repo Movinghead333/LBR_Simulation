@@ -299,10 +299,10 @@ public class RobotController : MonoBehaviour
         // joint 6
         Vector3 j5RotationAxis = Vector3.Cross(wristTCPVec, j4RotationAxis);
         Vector3 currentNormalVec = Vector3.Cross(wristTCPVec, j5RotationAxis);
-        Vector3 directionCheck = wristPos + currentNormalVec.normalized * 0.2f;
         float normalDirSign = Mathf.Sign(Vector3.Dot(j5RotationAxis, normalVector));
         float j6Angle = Vector3.Angle(normalVector, currentNormalVec) * normalDirSign;
-        PositionProbe.Instance.SetPositionProbe(directionCheck);
+        //Vector3 directionCheck = wristPos + currentNormalVec.normalized * 0.2f;
+        //PositionProbe.Instance.SetPositionProbe(directionCheck);
 
         Debug.Log("Direction: " + normalDirSign);
         
@@ -311,8 +311,57 @@ public class RobotController : MonoBehaviour
         return config;
     }
 
+    public float[] Calculate7AxisIK(
+        Vector3 robotBasePosition,
+        Vector3 targetPosition,
+        Vector3 approachVector,
+        Vector3 slideVector,
+        Vector3 normalVector,
+        float j2angle)
+    {
+        float[] config = new float[7];
 
-    public static Vector3 getTranslation(Matrix4x4 mat)
+        /* precalculations for later steps */
+
+        // calculate position of spherical should joint
+        Vector3 shoulderPos = robotBasePosition + new Vector3(0f, 0.31f, 0f);
+
+        // calculate position of spherical wrist joint
+        float testDist = wristFlunchDist + 0.05f;
+        Vector3 wristPos = targetPosition - (approachVector.normalized * testDist);
+
+        // calculate vector and distance between shoulder and wrist joint centers
+        Vector3 shoulderWristDir = (wristPos - shoulderPos);
+        float shoulderWristDistance = shoulderWristDir.magnitude;
+
+        if (shoulderWristDistance > 0.79f)
+        {
+            throw new System.InvalidOperationException("Distance of " + shoulderWristDistance + " is out of range! Point: " + targetPosition);
+        }
+
+
+        /* get the j3 segment (elbow) position for theta2 = 0° */
+
+        // get the j1
+        float acosArg = GetArcCosArgForAlphaAngle(aSide, bSide, shoulderWristDistance);
+        float alphaAngle = Mathf.Acos(acosArg) * Mathf.Rad2Deg;
+        float objDirUPDirAngle = Vector3.Angle(Vector3.up, shoulderWristDir);
+        float j1Angle = objDirUPDirAngle - alphaAngle;
+
+        // get the elbow position based on the ealier calculated j1angle
+        Vector3 theta1RotationAxis = Vector3.Cross(Vector3.up, shoulderWristDir);
+        Matrix4x4 rotMatrix = Matrix4x4.Rotate(Quaternion.AngleAxis(j1Angle, theta1RotationAxis));
+        Vector3 segment1Vec = rotMatrix.MultiplyVector(Vector3.up);
+        Vector3 elbowPos = shoulderPos + segment1Vec.normalized * aSide;
+
+        /* rotate the elbow position around the shoulderWristVector */
+
+
+        return config;
+    }
+
+
+        public static Vector3 getTranslation(Matrix4x4 mat)
     {
         return new Vector3(mat.m03, mat.m13, mat.m23);
     }
