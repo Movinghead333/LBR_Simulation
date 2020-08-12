@@ -31,8 +31,15 @@ public class AdvancedIKTest : MonoBehaviour
     Vector3 slideVector    = new Vector3(0, 0, 1);
     Vector3 normalVector   = new Vector3(1, 0, 0);
 
+    //[Range(-170f, 170f)]
+    //public float facingAxisAngle = 0f;
+
+    [Header("Theta 2")]
     [Range(-170f, 170f)]
-    public float facingAxisAngle = 0f;
+    public float theta2Input = 0f;
+
+    public bool cycleTheta2 = false;
+    public float degreesPerSecond = 90.0f;
 
     public GameObject targetObject;
     public GameObject targetObject2;
@@ -51,6 +58,18 @@ public class AdvancedIKTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (cycleTheta2)
+        {
+            if (theta2Input < 360.0f)
+            {
+                theta2Input += Time.deltaTime * degreesPerSecond;
+            }
+            else
+            {
+                theta2Input = 0.0f;
+            }
+        }
+
         if (idleAnimation)
         {
             xValue = Mathf.Cos(Time.time);
@@ -78,12 +97,19 @@ public class AdvancedIKTest : MonoBehaviour
         {
             if (!tested)
             {
-                float[] ikConfig = robotController.CalculateAdvancedIK(
+                //float[] ikConfig = robotController.CalculateAdvancedIK(
+                //    robotController.gameObject.transform.position,
+                //    targetPosition,
+                //    approachVector,
+                //    slideVector,
+                //    normalVector);
+                float[] ikConfig = robotController.Calculate7AxisIK(
                     robotController.gameObject.transform.position,
                     targetPosition,
                     approachVector,
                     slideVector,
-                    normalVector);
+                    normalVector,
+                    theta2Input);
 
 
 
