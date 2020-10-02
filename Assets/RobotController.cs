@@ -407,6 +407,34 @@ public class RobotController : MonoBehaviour
         Debug.Log("Error distance: " + errorDist);
         //Debug.Log("Elbow position: " + newElbowPos.x + " " + newElbowPos.y + " " + newElbowPos.z);
 
+
+        /* Calculate theta4 */
+        Vector3 theta4RotationPlaneNormal = wristPos - newElbowPos;
+        Vector3 wristTCPprojection =
+            Vector3.ProjectOnPlane(approachVector, theta4RotationPlaneNormal);
+        Vector3 wristShoulderProjection =
+            Vector3.ProjectOnPlane(-shoulderWristDir, theta4RotationPlaneNormal);
+
+        float theta4 = Vector3.SignedAngle(
+            wristShoulderProjection, wristTCPprojection, theta4RotationPlaneNormal);
+        config[4] = theta4;
+
+
+        /* Calculate theta5 */
+        Vector3 theta5RotationPlaneNormal =
+            Vector3.Cross(theta4RotationPlaneNormal, approachVector);
+        float theta5 = Vector3.SignedAngle(
+            theta4RotationPlaneNormal, approachVector, theta5RotationPlaneNormal);
+        config[5] = theta5;
+
+
+        /* Calculate theta6 */
+        Vector3 projectedDefaultDirection =
+            Vector3.ProjectOnPlane(theta4RotationPlaneNormal, approachVector);
+        float theta6 =Vector3.SignedAngle(
+            projectedDefaultDirection, normalVector, approachVector);
+        config[6] = theta6;
+
         return config;
     }
 

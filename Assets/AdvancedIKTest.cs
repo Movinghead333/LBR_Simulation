@@ -35,10 +35,11 @@ public class AdvancedIKTest : MonoBehaviour
     //public float facingAxisAngle = 0f;
 
     [Header("Theta 2")]
-    [Range(-170f, 170f)]
+    [Range(-180f, 180f)]
     public float theta2Input = 0f;
 
     public bool cycleTheta2 = false;
+    public bool cycleOrientationAngles = false;
     public float degreesPerSecond = 90.0f;
 
     public GameObject targetObject;
@@ -75,6 +76,13 @@ public class AdvancedIKTest : MonoBehaviour
             xValue = Mathf.Cos(Time.time);
             yValue = Mathf.Sin(Time.time);
             zValue = Mathf.Sin(Time.time);
+        }
+
+        if (cycleOrientationAngles)
+        {
+            yawAngle = Mathf.Cos(Time.time) * 180f;
+            pitchAngle = 0.5f * Mathf.Sin(Time.time) * 180f;
+            rollAngle =  2f * Mathf.Cos(Time.time) * 180f;
         }
 
         targetPosition = targetObject.transform.position;
